@@ -1,4 +1,4 @@
 name: LocalMarket
 main: com.survivorserver.Dasfaust.LocalMarket.LocalMarket
-version: 0.0.1
+version: ${version}
 depend: [GlobalMarket]
