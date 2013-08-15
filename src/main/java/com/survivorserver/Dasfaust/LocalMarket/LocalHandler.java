@@ -178,6 +178,13 @@ public class LocalHandler implements Listener {
 		}
 	}
 	
+	public void removeCreator(String name) {
+		if (creating.containsKey(name)) {
+			localMarket.getServer().getScheduler().cancelTask(Integer.parseInt(creating.get(name)[1]));
+			creating.remove(name);
+		}
+	}
+	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) && event.getClickedBlock().getType() == Material.CHEST) {
@@ -204,7 +211,7 @@ public class LocalHandler implements Listener {
 						int task = new BukkitRunnable() {
 							public void run() {
 								if (creating.containsKey(name)) {
-									creating.remove(name);
+									removeCreator(name);
 									Player p = localMarket.getServer().getPlayer(name);
 									if (p != null) {
 										p.sendMessage(ChatColor.GREEN + locale.get("localmarket.creation_cancelled"));
@@ -239,7 +246,7 @@ public class LocalHandler implements Listener {
 			event.setCancelled(true);
 			String response = event.getMessage();
 			if (response.equalsIgnoreCase("cancel")) {
-				creating.remove(player.getName());
+				removeCreator(player.getName());
 				player.sendMessage(ChatColor.GREEN + locale.get("localmarket.creation_cancelled"));
 			} else {
 				String[] msg = response.split(" ");
@@ -288,7 +295,7 @@ public class LocalHandler implements Listener {
 				storeListing(creating.get(player.getName())[0], toList, price, infinite ? market.getInfiniteSeller() : player.getName());
 				player.sendMessage(ChatColor.GREEN + locale.get("item_listed"));
 				market.getStorage().storeHistory(player.getName(), locale.get("history.item_listed", market.getItemName(toList) + "x" + toList.getAmount(), price));
-				creating.remove(player.getName());
+				removeCreator(player.getName());
 			}
 		}
 	}
