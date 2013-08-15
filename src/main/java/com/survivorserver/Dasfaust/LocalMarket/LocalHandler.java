@@ -11,6 +11,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
@@ -30,6 +31,7 @@ import com.survivorserver.GlobalMarket.InterfaceViewer;
 import com.survivorserver.GlobalMarket.Listing;
 import com.survivorserver.GlobalMarket.LocaleHandler;
 import com.survivorserver.GlobalMarket.Market;
+import com.survivorserver.GlobalMarket.Events.ViewerRemoveEvent;
 import com.survivorserver.GlobalMarket.Interface.MarketInterface;
 
 public class LocalHandler implements Listener {
@@ -234,6 +236,8 @@ public class LocalHandler implements Listener {
 					market.getInterfaceHandler().addViewer(viewer);
 					market.getInterfaceHandler().refreshInterface(viewer, gui);
 					market.getInterfaceHandler().openGui(viewer);
+					event.getPlayer().playNote(locFromString(loc), (byte) 1, (byte) 1);
+					player.playSound(player.getLocation(), Sound.CHEST_OPEN, 0.7f, 1);
 				}
 			}
 		}
@@ -335,6 +339,18 @@ public class LocalHandler implements Listener {
 				} else {
 					event.getPlayer().sendMessage(ChatColor.RED + locale.get("localmarket.you_cant_remove_this_chest"));
 				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void viewerRemove(ViewerRemoveEvent event) {
+		InterfaceViewer viewer = event.getViewer();
+		if (viewer instanceof LocalViewer) {
+			Player player = localMarket.getServer().getPlayer(viewer.getViewer());
+			if (player != null) {
+				player.playNote(locFromString(((LocalViewer) viewer).getLoc()), (byte) 1, (byte) 0);
+				player.playSound(player.getLocation(), Sound.CHEST_CLOSE, 0.7f, 1);
 			}
 		}
 	}
