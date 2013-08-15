@@ -39,11 +39,11 @@ public class LocalHandler implements Listener {
 	LocaleHandler locale;
 	FileConfiguration conf;
 	Economy econ;
-	Map<String, String> creating;
+	Map<String, String[]> creating;
 	
 	public LocalHandler(LocalMarket localMarket) {
 		this.localMarket = localMarket;
-		creating = new HashMap<String, String>();
+		creating = new HashMap<String, String[]>();
 	}
 	
 	public void load(Market market, FileConfiguration conf) {
@@ -200,11 +200,8 @@ public class LocalHandler implements Listener {
 							return;
 						}
 						player.sendMessage(ChatColor.GREEN + locale.get("localmarket.type_your_price"));
-						if (!creating.containsKey(player.getName())) {
-							creating.put(player.getName(), loc);
-						}
 						final String name = player.getName();
-						new BukkitRunnable() {
+						int task = new BukkitRunnable() {
 							public void run() {
 								if (creating.containsKey(name)) {
 									creating.remove(name);
@@ -214,7 +211,11 @@ public class LocalHandler implements Listener {
 									}
 								}
 							}
-						}.runTaskLater(localMarket, 200);
+						}.runTaskLater(localMarket, 200).getTaskId();
+						if (creating.containsKey(player.getName())) {
+							localMarket.getServer().getScheduler().cancelTask(Integer.parseInt(creating.get(player.getName())[1]));
+						}
+						creating.put(player.getName(), new String[] {loc, "" + task});
 					} else {
 						player.sendMessage(ChatColor.RED + locale.get("localmarket.hold_an_item"));
 					}
@@ -284,7 +285,7 @@ public class LocalHandler implements Listener {
 				if (!infinite) {
 					player.setItemInHand(new ItemStack(Material.AIR));
 				}
-				storeListing(creating.get(player.getName()), toList, price, infinite ? market.getInfiniteSeller() : player.getName());
+				storeListing(creating.get(player.getName())[0], toList, price, infinite ? market.getInfiniteSeller() : player.getName());
 				player.sendMessage(ChatColor.GREEN + locale.get("item_listed"));
 				market.getStorage().storeHistory(player.getName(), locale.get("history.item_listed", market.getItemName(toList) + "x" + toList.getAmount(), price));
 				creating.remove(player.getName());
