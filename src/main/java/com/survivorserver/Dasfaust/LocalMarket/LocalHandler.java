@@ -197,7 +197,7 @@ public class LocalHandler implements Listener {
 					ItemStack inHand = player.getItemInHand();
 					if (inHand != null && inHand.getType() != Material.AIR) {
 						if (!localMarket.getConfig().getBoolean("enable_pages")) {
-							if (getNumListings(loc) > chest.getInventory().getSize() - 9) {
+							if (getNumListings(loc) >= chest.getInventory().getSize() - 9) {
 								player.sendMessage(ChatColor.RED + locale.get("localmarket.too_many_listings"));
 								return;
 							}
