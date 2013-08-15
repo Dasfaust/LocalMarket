@@ -52,6 +52,14 @@ public class LocalMarket extends JavaPlugin implements Listener {
 		market.getLocale().registerLocale("localmarket.aim_cursor_at_chest", "Please aim your cursor at a chest");
 	}
 	
+	public void onDisable() {
+		if (market != null) {
+			market.getInterfaceHandler().unregisterInterface(market.getInterfaceHandler().getInterface("Local Listings"));
+			market.getCmd().unregisterSubCommand(market.getCmd().findExecutor("chest"));
+			market.getConfigHandler().unregisterCustomConfig("local_listings", true);
+		}
+	}
+	
 	@EventHandler
 	public void pluginLoad(PluginEnableEvent event) {
 		if (event.getPlugin() instanceof Market) {

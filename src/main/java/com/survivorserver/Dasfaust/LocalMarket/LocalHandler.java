@@ -161,9 +161,26 @@ public class LocalHandler implements Listener {
 		return localMarket.getConfig().getBoolean("enable_inventory");
 	}
 	
+	public void closeAllLocalViewers() {
+		List<InterfaceViewer> toRemove = new ArrayList<InterfaceViewer>();
+		for (InterfaceViewer viewer : market.getInterfaceHandler().getAllViewers()) {
+			if (viewer instanceof LocalViewer) {
+				toRemove.add(viewer);
+			}
+		}
+		for (InterfaceViewer viewer : toRemove) {
+			market.getInterfaceHandler().removeViewer(viewer);
+			Player player = localMarket.getServer().getPlayer(viewer.getViewer());
+			if (player != null) {
+				player.closeInventory();
+				player.sendMessage(ChatColor.DARK_GRAY + "" + ChatColor.ITALIC + locale.get("interface_closed_due_to_reload"));
+			}
+		}
+	}
+	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL && event.getClickedBlock().getType() == Material.CHEST) {
+		if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) && event.getClickedBlock().getType() == Material.CHEST) {
 			Chest chest = (Chest) event.getClickedBlock().getState();
 			String loc = getChest(chest);
 			if (loc != null) {
