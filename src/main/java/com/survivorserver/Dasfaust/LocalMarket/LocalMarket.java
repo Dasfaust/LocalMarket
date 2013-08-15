@@ -27,6 +27,7 @@ public class LocalMarket extends JavaPlugin implements Listener {
 		getConfig().addDefault("enable_inventory", true);
 		getConfig().addDefault("enable_metrics", true);
 		getConfig().addDefault("enable_sounds", true);
+		getConfig().addDefault("allow_chest_sharing", false);
 		getConfig().addDefault("max_shops", 0);
 		getConfig().options().copyDefaults(true);
 		saveConfig();
@@ -51,6 +52,7 @@ public class LocalMarket extends JavaPlugin implements Listener {
 		market.getLocale().registerLocale("localmarket.chest_created", "Market chest created");
 		market.getLocale().registerLocale("localmarket.already_market_chest", "That chest is already a Market chest");
 		market.getLocale().registerLocale("localmarket.aim_cursor_at_chest", "Please aim your cursor at a chest");
+		market.getLocale().registerLocale("localmarket.you_dont_own_this_chest", "You don't own this chest");
 	}
 	
 	public void onDisable() {

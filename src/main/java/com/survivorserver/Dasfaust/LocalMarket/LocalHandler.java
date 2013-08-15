@@ -191,6 +191,10 @@ public class LocalHandler implements Listener {
 		return localMarket.getConfig().getBoolean("enable_sounds");
 	}
 	
+	public boolean chestSharing() {
+		return localMarket.getConfig().getBoolean("enable_chest_sharing");
+	}
+	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) && event.getClickedBlock().getType() == Material.CHEST) {
@@ -202,6 +206,12 @@ public class LocalHandler implements Listener {
 				if (player.isSneaking()) {
 					ItemStack inHand = player.getItemInHand();
 					if (inHand != null && inHand.getType() != Material.AIR) {
+						if (!chestSharing()) {
+							if (!conf.getString("chests." + loc + ".owner").equalsIgnoreCase(player.getName())) {
+								player.sendMessage(ChatColor.RED + locale.get("localmarket.you_dont_own_this_chest"));
+								return;
+							}
+						}
 						if (!localMarket.getConfig().getBoolean("enable_pages")) {
 							if (getNumListings(loc) >= chest.getInventory().getSize() - 9) {
 								player.sendMessage(ChatColor.RED + locale.get("localmarket.too_many_listings"));
