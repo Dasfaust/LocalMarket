@@ -104,7 +104,9 @@ public class LocalInterface extends ListingsInterface {
 		if (!((Listing) item).getSeller().equalsIgnoreCase(market.getInfiniteSeller())) {
 			handler.removeListing(((LocalViewer) viewer).getLoc(), item.getId());
 		}
-		((Player) event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.ORB_PICKUP, 1, 1);
+		if (handler.enableSounds()) {
+			((Player) event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.ORB_PICKUP, 0.8f, 1);
+		}
 		market.getInterfaceHandler().updateAllViewers();
 	}
 
@@ -126,7 +128,9 @@ public class LocalInterface extends ListingsInterface {
 				market.getStorage().storeMail(item.getItem(), ((Listing) item).getSeller(), null, true);
 			}
 		}
-		player.playSound(player.getLocation(), Sound.ORB_PICKUP, 1, 1);
+		if (handler.enableSounds()) {
+			((Player) event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.ORB_PICKUP, 0.8f, 1);
+		}
 		viewer.resetActions();
 		market.getInterfaceHandler().updateAllViewers();
 	}

@@ -187,6 +187,10 @@ public class LocalHandler implements Listener {
 		}
 	}
 	
+	public boolean enableSounds() {
+		return localMarket.getConfig().getBoolean("enable_sounds");
+	}
+	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) && event.getClickedBlock().getType() == Material.CHEST) {

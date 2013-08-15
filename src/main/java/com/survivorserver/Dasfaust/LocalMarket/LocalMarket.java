@@ -26,6 +26,7 @@ public class LocalMarket extends JavaPlugin implements Listener {
 		getConfig().addDefault("allow_pages", false);
 		getConfig().addDefault("enable_inventory", true);
 		getConfig().addDefault("enable_metrics", true);
+		getConfig().addDefault("enable_sounds", true);
 		getConfig().addDefault("max_shops", 0);
 		getConfig().options().copyDefaults(true);
 		saveConfig();
