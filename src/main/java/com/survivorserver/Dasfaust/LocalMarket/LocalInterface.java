@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -16,7 +15,6 @@ import com.survivorserver.GlobalMarket.Listing;
 import com.survivorserver.GlobalMarket.ListingsInterface;
 import com.survivorserver.GlobalMarket.Market;
 import com.survivorserver.GlobalMarket.Interface.MarketItem;
-import com.survivorserver.GlobalMarket.InterfaceViewer.InterfaceAction;
 
 public class LocalInterface extends ListingsInterface {
 
@@ -42,8 +40,11 @@ public class LocalInterface extends ListingsInterface {
 		Listing listing = (Listing) marketItem;
 		ItemStack item = listing.getItem();
 		ItemMeta meta = item.getItemMeta().clone();
+		
+		boolean isSeller = viewer.getViewer().equalsIgnoreCase(listing.getSeller());
+		boolean isAdmin = market.getInterfaceHandler().isAdmin(viewer.getViewer());
+		
 		List<String> lore = meta.getLore();
-		Inventory inv = market.getServer().getPlayer(viewer.getViewer()).getInventory();
 		if (!meta.hasLore()) {
 			lore = new ArrayList<String>();
 		}
@@ -51,39 +52,40 @@ public class LocalInterface extends ListingsInterface {
 		String seller = ChatColor.WHITE + market.getLocale().get("seller") + ChatColor.GRAY + ChatColor.ITALIC + listing.getSeller();
 		lore.add(price);
 		lore.add(seller);
-		if (!viewer.getViewer().equalsIgnoreCase(listing.getSeller())) {
+		
+		// Don't want people buying their own listings
+		if (isSeller && leftClick) {
+			viewer.resetActions();
+		}
+		
+		// Or canceling listings they don't have permissions to
+		if (!isSeller && shiftClick) {
+			if (!isAdmin) {
+				viewer.resetActions();
+			}
+		}
+		
+		if (!isSeller) {
 			String buyMsg = ChatColor.YELLOW + market.getLocale().get("click_to_buy");
 			if (leftClick) {
 				if (market.getEcon().has(viewer.getViewer(), listing.getPrice())) {
-					if (handler.useInventory() && inv.firstEmpty() < 0) {
-						buyMsg = ChatColor.RED + market.getLocale().get("full_inventory");
-						viewer.resetActions();
-					} else {
-						buyMsg = ChatColor.GREEN + market.getLocale().get("click_again_to_confirm");
-					}
+					buyMsg = ChatColor.GREEN + market.getLocale().get("click_again_to_confirm");
 				} else {
 					buyMsg = ChatColor.RED + market.getLocale().get("not_enough_money", market.getEcon().currencyNamePlural());
 					viewer.resetActions();
 				}
 			}
 			lore.add(buyMsg);
-		} else {
-			if (leftClick) {
-				viewer.setLastAction(InterfaceAction.RIGHTCLICK);
-			}
 		}
-		if (viewer.getViewer().equalsIgnoreCase(listing.getSeller()) || market.getInterfaceHandler().isAdmin(viewer.getViewer())) {
+		
+		if (isSeller || isAdmin) {
 			String removeMsg = ChatColor.DARK_GRAY + market.getLocale().get("shift_click_to_remove");
 			if (shiftClick) {
-				if (handler.useInventory() && inv.firstEmpty() < 0) {
-					removeMsg = ChatColor.RED + market.getLocale().get("full_inventory");
-					viewer.resetActions();
-				} else {
-					removeMsg = ChatColor.GREEN + market.getLocale().get("shift_click_again_to_confirm");
-				}
+				removeMsg = ChatColor.GREEN + market.getLocale().get("shift_click_again_to_confirm");
 			}
 			lore.add(removeMsg);
 		}
+		
 		if (listing.getSeller().equalsIgnoreCase(market.getInfiniteSeller())) {
 			lore.add(ChatColor.LIGHT_PURPLE + market.getLocale().get("interface.infinite"));
 		}
